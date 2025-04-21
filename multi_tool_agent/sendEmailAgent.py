@@ -18,7 +18,7 @@ def sendEmail(tool_context:ToolContext):
         "from": "onboarding@resend.dev",
         "to": "spacefatcsyou@gmail.com",
         "subject": "Hello World",
-        "html": f"<p>Data confirmed !!</p> <p>This is confidence score {tool_context.state.get("confidence_score")}</p>"
+        "html": f"<p>Your Trade is confirmed</p> <p>This is confidence score {tool_context.state.get("confidence_score")}</p>"
         })
     return r 
 

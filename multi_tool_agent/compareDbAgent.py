@@ -2,18 +2,29 @@ from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.adk.tools import ToolContext
+from google import genai
+from dotenv import load_dotenv
+import os
+load_dotenv()
+API_KEY = os.getenv("GOOGLE_API_KEY")
 
-customDB = [
-  { "name": "Title", "value": "ISDA 2021 Definitions Consolidated Confirmation Templates - COLOUR CODED" },
-  { "name": "Version", "value": "1.0" },
-  { "name": "Publication Date", "value": "June 11, 2021" },
-  { "name": "Effective Date", "value": "June 11, 2021" },
-  { "name": "Publisher", "value": "International Swaps and Derivatives Association, Inc. (ISDA)" },
-  { "name": "Copyright", "value": "© 2021 by International Swaps and Derivatives Association, Inc." },
-  { "name": "Document Type", "value": "Annotated Exhibits to the 2021 ISDA Interest Rate Derivatives Definitions" },
-  { "name": "Purpose", "value": "Information and commentary on changes from the 2006 ISDA Definitions" },
-  { "name": "Color Coding Notes", "value": "BLUE = New in 2021, RED = Changes from 2006, ORANGE = Template updates, GREEN = Supplement 75/76 changes" }
-]
+customDB = {
+  "document_title": "Annotated Exhibits to the 2021 ISDA Interest Rate Derivatives Definitions",
+  "version": "Version 1",
+  "date_published": "June 11, 2021",
+  "effective_date": "June 11, 2021",
+  "copyright_year": "2021",
+  "publisher": "International Swaps and Derivatives Association, Inc. (ISDA)",
+  "intended_use": "Provides annotated exhibits to the 2021 ISDA Interest Rate Derivatives Definitions, highlighting changes and providing commentary.",
+  "key_changes_highlighted": [
+    "New fields introduced by the 2021 Definitions (BLUE)",
+    "Changes to existing elements in the 2006 Definitions made by the 2021 Definitions (RED)",
+    "Notable additions/changes to template (not due to the 2021 Definitions) (ORANGE)",
+    "Changes due to Supplement 75/76 (Overnight Rate Compounding/Averaging) (GREEN)"
+  ],
+  "licensing_note": "Document is created under license from ISDA and should not be used, copied or disseminated other than in accordance with the terms of that license.",
+  "disclaimer": "Document is for information purposes only. No representation or warranty is made as to its accuracy, completeness, or suitability for any purpose. ISDA and its affiliates are not liable for any losses incurred as a result of relying upon it. Readers should consult the source documents and external advisors for a definitive view."
+}
 
 
 def comparedata(tool_context:ToolContext):
@@ -21,22 +32,16 @@ def comparedata(tool_context:ToolContext):
     Returns:
         str: Confidence score as a percentage string (e.g., "80%")
     """
-    
+    client = genai.Client(api_key=API_KEY)
     print("Tool:comapredata: called")
     metadata = tool_context.state.get("metaData")
-    matches = 0
-    total = len(customDB)
-    for item in customDB:
-        for res in metadata:
-            if item["name"] == res["name"] or item["value"] == res["value"]:
-                matches += 1
-                break 
     
-    confidence = (matches / total) * 100
-    tool_context.state["confidence_score"] =  confidence
-    print("This is confidence")
-    print(confidence)
-    return f" confidence score is {confidence:.0f}%"
+    response = client.models.generate_content(
+      model="gemini-2.0-flash",
+      contents=f"compare {customDB} and {metadata} and give a confidence score , it be in format like only : nn%"
+    )
+    tool_context.state["confidence_score"] =  response.text
+    return f" confidence score is {response.text}%"
 
 compareDb_data_agent = None
 try:

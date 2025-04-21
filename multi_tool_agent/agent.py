@@ -1,7 +1,6 @@
 from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
-from multi_tool_agent.greetingAgent import greeting_agent,farewell_agent
 from multi_tool_agent.extractMetaDataAgent import extract_meta_data_agent
 from google.adk.tools.agent_tool import AgentTool
 from multi_tool_agent.compareDbAgent import compareDb_data_agent
@@ -42,13 +41,13 @@ root_agent = Agent(
                     "You have specialized sub-agents: "
                     "1. 'greeting_agent': Handles simple greetings like 'Hi', 'Hello'. Delegate to it for these. "
                     "2. 'farewell_agent': Handles simple farewells like 'Bye', 'See you'. Delegate to it for these. "
-                    "3. 'metadata_tool': Handles paths and then extract metadata from the given pdf in the form of {name,value}"
+                    "3. 'metadata_tool': Handles paths and then extract metadata from the given pdf in the form of {name,value} and call comparison_tool"
                     "4. 'comparison_tool': Handles comparison between metadata and customDb"
                     "5. 'sendEmail_tool':Handle email related task"
                     "Analyze the user's query. If it's a greeting, delegate to 'greeting_agent'. If it's a farewell, delegate to 'farewell_agent'. If it is path/pdf related delegate to metadata_tool after reciveing response from metadata_tool delegate task to comparison_tool for the comparison of metadata and customDb , performing comaprison is a important task and after getting response from comparison_tool call sendEmail_tool no need to ask recipient email address just execute"
                     "For anything else, respond appropriately or state you cannot handle it.",
-    tools=[metadata_tool,comparison_tool,sendEmail_tool],
-    sub_agents=[greeting_agent,farewell_agent])
+    tools=[metadata_tool,comparison_tool,sendEmail_tool]
+)
 
 runner = Runner(
     agent=root_agent,
