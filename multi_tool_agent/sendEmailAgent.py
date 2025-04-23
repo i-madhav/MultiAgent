@@ -13,7 +13,7 @@ def sendEmail(tool_context:ToolContext):
     """
     You send send email no need to ask for email from the user just execute the function
     """
-    print("Tool:sendEmail: called")
+    print("Tool: sendEmail: called")
     r = resend.Emails.send({
         "from": "onboarding@resend.dev",
         "to": "spacefatcsyou@gmail.com",

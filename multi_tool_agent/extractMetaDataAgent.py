@@ -14,69 +14,27 @@ logging.basicConfig(level=logging.ERROR)
 
 load_dotenv()
 API_KEY = os.getenv("GOOGLE_API_KEY")
-# def parse_given_path(pdf_path: str, tool_context:ToolContext) -> dict:
-#     """Retrieves the content of the pdf on the given path
-#          Args:
-#       pdf_path (str): like ex: "C:/Users/madha/Downloads/MadhavSharmaResume.pdf"
-#       return {name,value}
-#     """
-#     try:
-#         print("Tool: parse_given_path:called")
-#         pdf_reader = PdfReader(pdf_path)
-#         metadata = []
-        
-#         # Extract standard metadata
-#         if pdf_reader.metadata:
-#             for key, value in pdf_reader.metadata.items():
-#                 clean_key = key.replace("/", "").strip()
-#                 metadata.append({
-#                     "name": clean_key,
-#                     "value": str(value)
-#                 })
-        
-#         # Add custom fields
-#         metadata.extend([
-#             {"name": "TotalPages", "value": str(len(pdf_reader.pages))},
-#             {"name": "FileName", "value": os.path.basename(pdf_path)}
-#         ])
-#         tool_context.state["metaData"] = metadata
-#         return metadata
-#     except Exception as e:
-#         return {"status": "error", "message": f"PDF processing failed: {str(e)}"}
 
 def parse_given_path(pdf_path: str,tool_context:ToolContext):
        """
     Retrieves the content of the pdf on the given path
          Args:
       pdf_path (str): like ex: "C:/Users/madha/Downloads/MadhavSharmaResume.pdf"
+     return the metaData in the form of {name,value}
     """
        client = genai.Client(api_key=API_KEY)
        try:
-           print("tool: parse_given_path: called")
+           print("Tool: parse_given_path: called")
            reader = PdfReader(pdf_path)
            text = ""
            for page in reader.pages:
                text += page.extract_text()
-
-            
            response = client.models.generate_content(
-                        model="gemini-2.0-flash", contents=f"extract the metadats from the given text {text}"
+                        model="gemini-2.0-flash", contents=f"extract the metadatas from the given text {text},give response in the form of {{name,value}} json object"
                             )
            tool_context.state["metaData"] = response.text
-           return text
        except Exception as e:
            return f"Error reading PDF: {e}"
-
-# def get_vector_store(text_chunks):
-#     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-#     vector_store = FAISS.from_texts(text_chunks, embeddings)
-#     vector_store.save_local("faiss_index_meta_data")
-#     return True
-    
-# def get_text_chunks(text):
-#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
-#     chunks = text_splitter.split_text(text)
-#     return chunks
     
 
 extract_meta_data_agent = Agent(

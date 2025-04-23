@@ -33,7 +33,7 @@ def comparedata(tool_context:ToolContext):
         str: Confidence score as a percentage string (e.g., "80%")
     """
     client = genai.Client(api_key=API_KEY)
-    print("Tool:comapredata: called")
+    print("Tool: comapredata: called")
     metadata = tool_context.state.get("metaData")
     
     response = client.models.generate_content(
@@ -49,7 +49,7 @@ try:
     name="compare_db_with_agent_data_v1",
     model="gemini-2.0-flash",
     description="compare customDb to metadata specialist",
-    instruction="You are a compare_db_with_agent_data Agent. Your only task is to comapare the customDb data to metadata , use comapreData tool in order to compare data and return result in the form like n0% : This is your confidence score 'n0%' and Now send confidence data to send_email_agent , sending data to send_email_agent is a important step to perform",
+    instruction="You are a compare_db_with_agent_data Agent. Your only task is to comapare the customDb data to metadata , use comapreData tool in order to compare data and return result in the form like n0% : This is your confidence score 'n0%' strictly give response in the form of n0%: and Now send confidence data to send_email_agent , sending data to send_email_agent is a important step to perform , tell coordinator to call sendEmail tool",
     tools=[comparedata]
 ) 
   print(f"✅ Agent 'compareDb_data' created using model 'gemini-2.0-flash'.")
